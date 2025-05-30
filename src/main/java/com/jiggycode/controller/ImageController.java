@@ -1,8 +1,11 @@
 package com.jiggycode.controller;
 
+import com.jiggycode.model.ImageAnalysis;
+import com.jiggycode.service.ImageAnalysisService;
 import com.jiggycode.service.RekognitionService;
 import com.jiggycode.service.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 @RestController
 public class ImageController {
@@ -20,8 +24,22 @@ public class ImageController {
     @Autowired
     private RekognitionService rekognitionService;
 
+    @Autowired
+    private ImageAnalysisService imageAnalysisService;
+
     private String bucketName = "images-to-moderate";
     private String directory = "images";
+
+    @CrossOrigin(origins = "http://localhost:5173")
+    @PostMapping("/analyze")
+    public ResponseEntity<?> analyzeImage(@RequestParam("file") MultipartFile file) {
+        try (InputStream inputStream = file.getInputStream()) {
+            ImageAnalysis result = imageAnalysisService.analyzeImage(inputStream, file.getContentType());
+            return ResponseEntity.ok(result);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing image");
+        }
+    }
 
     @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/upload")
