@@ -22,10 +22,11 @@ public class ImageAnalysisService {
                         .text("You are an assistant that analyzes images.")
                         .text("If the image contains one or more human faces, describe the emotions or expressions shown.")
                         .text("If there are no faces, provide a general description of what is in the image.")
+                                .text("Describe facial features")
 //                        .text("Always return a short summary in the `description` field.")
                 )
                 .user(userMessage -> userMessage
-                        .text("Analyze this image and provide a description.  Describe emotions or expressions of person if face is available")
+                        .text("Analyze this image and provide a description.  Describe emotions or expressions of person if face is available.")
                         .media(MimeTypeUtils.parseMimeType(contentType), new InputStreamResource(imageInputStream))
                 )
                 .call()
