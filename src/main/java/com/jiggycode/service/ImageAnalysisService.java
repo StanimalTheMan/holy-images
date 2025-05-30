@@ -19,17 +19,24 @@ public class ImageAnalysisService {
     public ImageAnalysis analyzeImage(InputStream imageInputStream, String contentType) {
         return chatClient.prompt()
                 .system(systemMessage -> systemMessage
-                        .text("You are an assistant that analyzes images.")
-                        .text("If the image contains one or more human faces, describe the emotions or expressions shown.")
-                        .text("If there are no faces, provide a general description of what is in the image.")
-                                .text("Describe facial features")
-//                        .text("Always return a short summary in the `description` field.")
+                        .text("You are an assistant that analyzes images. Given an image, extract the following:")
+                        .text("1. A short overall description of the image.")
+                        .text("2. If faces are detected, describe for each: facial expressions, age group, and gender (if apparent).")
+                        .text("3. If no faces, describe the setting, objects, or scene.")
+                        .text("Respond in JSON format like this:")
+                        .text("{")
+                        .text("  \"description\": \"A woman smiling in a park.\",")
+                        .text("  \"faces\": [")
+                        .text("    { \"expression\": \"smiling\", \"ageGroup\": \"adult\", \"gender\": \"female\" }")
+                        .text("  ]")
+                        .text("}")
                 )
                 .user(userMessage -> userMessage
-                        .text("Analyze this image and provide a description.  Describe emotions or expressions of person if face is available.")
+                        .text("Analyze this image and return a detailed description in the format above.")
                         .media(MimeTypeUtils.parseMimeType(contentType), new InputStreamResource(imageInputStream))
                 )
                 .call()
-                .entity(ImageAnalysis.class);
+                .entity(ImageAnalysis.class); // You’ll need to update this class to support the new fields
     }
+
 }
